@@ -15,7 +15,8 @@ public class Spaceship {
 			final double fuelMass, 
 			final double velociyOfTheExhaustedGasses, 
 			final double burnRate) {
-		this.fuelMass = fuelMass;
+		this.fuelMass = Math.abs(fuelMass) < 1E-6 || fuelMass <= 0.0 ? 
+				0.0 : fuelMass;
 		this.massOfTheEmptySpaceship = massOfTheEmptySpaceship;
 		this.velociyOfTheExhaustedGasses = velociyOfTheExhaustedGasses;
 		this.burnRate = burnRate;

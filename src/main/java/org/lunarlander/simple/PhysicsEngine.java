@@ -7,9 +7,17 @@ class PhysicsEngine {
 
 		double deltaT = nanosToSeconds(System.nanoTime() - p.timestamp); 
 		double lostMass = c.getMassChangeInKg(deltaT);
-		
+		double thrust = p.spaceship.velociyOfTheExhaustedGasses * lostMass;
 		double acceleration = p.planet.gravitationalAccelleration - 
-				p.spaceship.velociyOfTheExhaustedGasses * lostMass / p.spaceship.getTotalMass();
+				thrust/p.spaceship.getTotalMass();
+		System.out.println(String.format(
+				"Velocity of the exhausted gasses / (m/s) = %f, lost Mass / kg =  %f, Thurst = %f, Accelleration = %f" , 
+				p.spaceship.velociyOfTheExhaustedGasses,
+				lostMass,
+				thrust,
+				acceleration
+				));
+
 		double deltaVerticalVelocity = acceleration * deltaT;
 		double heightAboveGround = p.heightAboveGround - p.verticalVelocity * deltaT;
 		

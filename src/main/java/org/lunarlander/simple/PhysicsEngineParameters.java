@@ -18,4 +18,16 @@ class PhysicsEngineParameters {
 		this.timestamp = System.nanoTime();
 		
 	}
+	
+	public PhysicsEngineParameters(final PhysicsEngineParameters params, 
+			final double heightAboveGround, 
+			final double verticalVelocity){
+		this.spaceship = params.spaceship;
+		this.planet = params.planet;
+		this.heightAboveGround = heightAboveGround;
+		this.verticalVelocity = verticalVelocity;
+		this.timestamp = params.timestamp;
+		
+	}
+
 }
