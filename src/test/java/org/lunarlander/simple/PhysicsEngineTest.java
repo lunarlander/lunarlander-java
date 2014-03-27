@@ -2,6 +2,14 @@ package org.lunarlander.simple;
 
 import static org.junit.Assert.*;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -10,6 +18,9 @@ public class PhysicsEngineTest {
 	
 	private PhysicsEngine engine;
 	
+	// epsilon used to compare doubles.
+	private static final double EPSILON = 1e-12;
+	
 	@Before
 	public void setUp() {
 		engine = new PhysicsEngine();
@@ -17,7 +28,7 @@ public class PhysicsEngineTest {
 
 	@Test
 	public void testFreeFall() {
-		// our spaceship does not exhaust any gased independent of the control function
+		// our spaceship does not exhaust any gases independent of the control function
 		// thus we a free fall
 		// lets use a mass of null - mass does not matter for the free fall.
 		Spaceship spaceship = new Spaceship(500, 1e3,0.0, 0.0);
@@ -26,7 +37,7 @@ public class PhysicsEngineTest {
 		// lets start at a height of 5km
 		// and with no vertical velocity
 		PhysicsEngineParameters params = 
-				new PhysicsEngineParameters(spaceship, Planet.MOON, 5.0E3, 0.0);
+				new PhysicsEngineParameters(spaceship, Planet.MOON, 5.0E3 /* 5km */ , 0.0);
 		
 		
 		while (params.heightAboveGround > 0.0) {
@@ -56,7 +67,7 @@ public class PhysicsEngineTest {
 		Spaceship spaceship = new Spaceship(500, 1e3, 2614.0, 5213.0);
 		ControlFunction f = new ControlFunction(spaceship);
 		
-		// lets start at a height of 5km
+		// lets start at a height of 0km
 		// and with no vertical velocity, 'cause we are standing on the ground
 		PhysicsEngineParameters params = 
 				new PhysicsEngineParameters(spaceship, Planet.MOON, 0.0, 0.0);
@@ -76,5 +87,50 @@ public class PhysicsEngineTest {
 		}
 		
 	}
+	
+	@Test
+	public void testBurnRate() throws InterruptedException, ExecutionException, TimeoutException {
+		
+		
+		// we know it takes one second to burn down our fuel
+		Future<Double> fuelMass; 
+		
+		ExecutorService calculatorService = 
+				Executors.newSingleThreadExecutor();
+		
+		fuelMass = calculatorService.submit(new Callable<Double>(){
+
+			Spaceship spaceship = new Spaceship(500, 5213.0, 2614.0, 5213.0);
+			PhysicsEngine engine = new PhysicsEngine();
+
+			
+			@Override
+			public Double call() throws Exception {
+				// lets start at a height of 5km
+				// and with no vertical velocity, 'cause we are standing on the ground
+				PhysicsEngineParameters params = 
+						new PhysicsEngineParameters(spaceship, 
+								Planet.MOON, 0.0, 0.0);
+				
+				ControlFunction f = new ControlFunction(spaceship);
+				while (Math.abs(params.spaceship.fuelMass) > EPSILON) {
+					params = engine.calculatePositionAndVelocity(
+							params, f);
+							
+					f = new ControlFunction(params.spaceship);
+					System.out.println(String.format("fuel mass %f", params.spaceship.fuelMass));
+				}
+				
+				return params.spaceship.fuelMass;
+			}
+			
+		});
+		
+		
+		// let's wait a little bit more than 1second
+		assertTrue(Math.abs(fuelMass.get(1, TimeUnit.SECONDS)) 
+				<= EPSILON);
+	}
+	
 
 }

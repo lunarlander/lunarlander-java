@@ -26,7 +26,7 @@ class PhysicsEngineParameters {
 		this.planet = params.planet;
 		this.heightAboveGround = heightAboveGround;
 		this.verticalVelocity = verticalVelocity;
-		this.timestamp = params.timestamp;
+		this.timestamp = System.nanoTime();
 		
 	}
 

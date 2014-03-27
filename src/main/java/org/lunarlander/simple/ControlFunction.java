@@ -14,7 +14,8 @@ public class ControlFunction {
 	 * there the spaceship has fuel.
 	 * 
 	 * @param deltaTimeInNannoseconds
-	 * @return
+	 * @return double with the mass change during the passed time intervall
+	 * 	in kg.
 	 */
 	public double getMassChangeInKg(final double deltaTimeInSeconds) {
 		double remainingBurnTimeInSeconds =  
